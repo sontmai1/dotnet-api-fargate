@@ -1,5 +1,8 @@
 resource "aws_security_group" "this" {
-  vpc_id = data.aws_vpc.this.id
+  # vpc_id = data.aws_vpc.this.id
+  name        = "sg_${var.app}"
+  # name_prefix = "sg_${var.app}" 
+  vpc_id      = "${aws_vpc.main.id}"
 
   ingress {
     from_port   = 80
@@ -21,4 +24,6 @@ resource "aws_security_group" "this" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags              = "${var.tags}"
+  
 }

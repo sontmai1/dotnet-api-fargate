@@ -1,7 +1,20 @@
+
+data "aws_subnet_ids" "this" {
+  # vpc_id = data.aws_vpc.this.id
+  vpc_id      = "${aws_vpc.main.id}"
+}
+
+output "subnet_ids" {
+  value = data.aws_subnet_ids.this.ids
+}
+
 resource "aws_lb" "this" {
   name            = "my-alb"
   security_groups = [aws_security_group.this.id]
-  subnets         = data.aws_subnet_ids.this.ids
+  # subnets         = data.aws_subnet_ids.this.ids
+  subnets         = ["subnet-07b7a3c6ef10dac8d", "subnet-06699ee0659b27672"]
+
+  tags            = "${var.tags}"
 }
 
 resource "aws_lb_listener" "http" {
@@ -26,7 +39,8 @@ resource "aws_lb_target_group" "this" {
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = data.aws_vpc.this.id
+  # vpc_id      = data.aws_vpc.this.id
+  vpc_id      = "${aws_vpc.main.id}"
 }
 
 resource "aws_lb_listener_rule" "this" {

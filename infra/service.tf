@@ -20,4 +20,6 @@ resource "aws_ecs_service" "this" {
   }
 
   depends_on = [aws_lb.this]
+
+  tags  = "${var.tags}"
 }

@@ -15,4 +15,6 @@ resource "aws_ecs_task_definition" "this" {
       ],
     }]
   )
+
+  tags                    = "${var.tags}"
 }

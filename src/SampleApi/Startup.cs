@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace SampleApi
+namespace SampleAPI
 {
     public class Startup
     {
@@ -26,6 +25,7 @@ namespace SampleApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
             // Add healthcheck service
             services.AddHealthChecks();
         }
@@ -33,12 +33,13 @@ namespace SampleApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Enable HealthCheck Path
-            app.UseHealthChecks("/");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            // Enable HealthCheck Path
+            app.UseHealthChecks("/");
 
             app.UseRouting();
 

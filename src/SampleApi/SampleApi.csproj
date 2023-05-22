@@ -5,4 +5,5 @@
   </PropertyGroup>
 
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'SampleAPI' " />
 </Project>

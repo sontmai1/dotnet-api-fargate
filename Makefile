@@ -2,7 +2,7 @@ export LAB_NAME=dotnet-api-fargate
 export PROJECT_NAME=SampleAPI
 export REPO_NAME=sample_api
 export ACCOUNT_NUMBER=$$(aws sts get-caller-identity --outpu  text --query 'Account')
-export AWS_DEFAULT_REGION=ap-southeast-1
+export AWS_DEFAULT_REGION=us-east-1
 export ECR_URL=${ACCOUNT_NUMBER}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
 export ALB_URL=$$(terraform output -json | jq -r '.url.value')
 
@@ -16,18 +16,23 @@ login-lab:
 		--rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v ${PWD}:/aws \
-		-p 5000:5000 \
+		-p 6000:6000 \
 		-p 80:80 \
 		--entrypoint sh \
 		--name ${LAB_NAME} \
 		${LAB_NAME}
 
 sample-project:
-	dotnet new webapi -o src/${PROJECT_NAME} --no-https
+	dotnet new webapi -o src/${PROJECT_NAME} --no-https --force
 
 # Override run url as docker within docker has localhost lookback issue to start as http://localhost:5000
 run-project:
-	dotnet run -p src/${PROJECT_NAME} --urls=http://*:5000/
+	dotnet run --project src/${PROJECT_NAME} --urls=http://*:6000/
+#	dotnet run --project src/${PROJECT_NAME}
+#	docker run --rm -it -p 6000:80 -p 6001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=6001 -e ASPNETCORE_ENVIRONMENT=Development -v ~/.microsoft/usersecrets/:/root/.microsoft/usersecrets -v ~/.aspnet/https:/root/.aspnet/https/ -v ~/.aws:/root/.aws ${LAB_NAME}
+
+# 	
+#	docker run --rm -it -p 6000:80 -p 6001:443 -e aspnetcore_urls="https://+;http://+" -e aspnetcore_https_port=6001 -e aspnetcore_environment=development -v ~/.microsoft/usersecrets/:/root/.microsoft/usersecrets -v ~/.aspnet/https:/root/.aspnet/https/ -v ~/.aws:/root/.aws src/${PROJECT_NAME}
 
 repo:
 	aws ecr create-repository --repository-name ${REPO_NAME}
