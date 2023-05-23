@@ -21,7 +21,7 @@ variable "aws_profile" {
 
 # Name of the application. This value should usually match the application tag below.
 variable "app" {
-  default = "SampleAPI"
+  default = "openPELServices"
 }
 
 # A map of the tags to apply to various resources. The required tags are:
@@ -34,15 +34,15 @@ variable "app" {
 variable "tags" {
   type = "map"
   default = {
-    application = "SampleAPI"
+    application = "openPELServices"
     environment = "dev"
   }
 }
 
-
+# NOTE: set 2 if we want alb (auto load balancer)
 variable "az_count" {
   description = "Number of AZs to cover in a given AWS region"
-  default     = "1"
+  default     = "1" 
 }
 
 variable "app_port" {

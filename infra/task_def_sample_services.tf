@@ -1,5 +1,5 @@
-resource "aws_ecs_task_definition" "this" {
-  family                   = "sample_api"
+resource "aws_ecs_task_definition" "task1" {
+  family                   = "test_api"
   memory                   = 512
   cpu                      = 256
   requires_compatibilities = ["FARGATE"]
@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "awsvpc"
   container_definitions = jsonencode(
     [{
-      "name" : "my-api"
+      "name" : "sample-services"
       "image" : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/sample_api",
       "portMappings" : [
         { containerPort = 80 }

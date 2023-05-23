@@ -1,6 +1,7 @@
 export LAB_NAME=dotnet-api-fargate
-export PROJECT_NAME=SampleAPI
-export REPO_NAME=sample_api
+export PROJECT_NAME=openPELServices
+export DOT_NET_VERSION=netcoreapp3.1
+export REPO_NAME=pelservices
 export ACCOUNT_NUMBER=$$(aws sts get-caller-identity --outpu  text --query 'Account')
 export AWS_DEFAULT_REGION=us-east-1
 export ECR_URL=${ACCOUNT_NUMBER}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
@@ -22,13 +23,17 @@ login-lab:
 		--name ${LAB_NAME} \
 		${LAB_NAME}
 
-sample-project:
-	dotnet new webapi -o src/${PROJECT_NAME} --no-https --force
+create-project:
+#	dotnet new webapi -o src/${PROJECT_NAME} --no-https --force
+	dotnet new webapi -o src/${PROJECT_NAME} --no-https --force --framework ${DOT_NET_VERSION}
+
+	
+
 
 # Override run url as docker within docker has localhost lookback issue to start as http://localhost:5000
 run-project:
-	dotnet run --project src/${PROJECT_NAME} --urls=http://*:6000/
-#	dotnet run --project src/${PROJECT_NAME}
+#	dotnet run --project src/${PROJECT_NAME} --urls=http://*:6000/
+	dotnet run --project src/${PROJECT_NAME}
 #	docker run --rm -it -p 6000:80 -p 6001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=6001 -e ASPNETCORE_ENVIRONMENT=Development -v ~/.microsoft/usersecrets/:/root/.microsoft/usersecrets -v ~/.aspnet/https:/root/.aspnet/https/ -v ~/.aws:/root/.aws ${LAB_NAME}
 
 # 	
@@ -59,5 +64,5 @@ test:
 
 kill:
 	terraform destroy -auto-approve infra
-	aws ecr list-images --repository-name ${REPO_NAME} --query 'imageIds[*].imageDigest' --output text | while read imageId; do aws ecr batch-delete-image --repository-name ${REPO_NAME} --image-ids imageDigest=$$imageId; done
-	aws ecr delete-repository --repository-name ${REPO_NAME}
+#	aws ecr list-images --repository-name ${REPO_NAME} --query 'imageIds[*].imageDigest' --output text | while read imageId; do aws ecr batch-delete-image --repository-name ${REPO_NAME} --image-ids imageDigest=$$imageId; done
+#	aws ecr delete-repository --repository-name ${REPO_NAME}
