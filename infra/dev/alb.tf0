@@ -14,7 +14,11 @@ resource "aws_lb" "this" {
   # subnets         = data.aws_subnet_ids.this.ids
   subnets         = ["subnet-0110e8d21c1375c4b"]
 
-  tags            = "${var.tags}"
+  tags = {
+    Name        = "lb-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
 }
 
 resource "aws_lb_listener" "http" {

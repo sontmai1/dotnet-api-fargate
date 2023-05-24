@@ -25,6 +25,10 @@ resource "aws_security_group" "this" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags              = "${var.tags}"
+  tags = {
+    Name        = "sg-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
   
 }

@@ -1,4 +1,4 @@
 resource "aws_ecs_cluster" "this" {
-  name = "test-cluster"
+  name = "${var.app}-${var.env}"
   tags = "${var.tags}"
 }

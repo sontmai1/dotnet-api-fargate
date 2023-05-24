@@ -1,7 +1,11 @@
 # IGW for the public subnet
 resource "aws_internet_gateway" "gw" {
   vpc_id = "${aws_vpc.main.id}"
-  tags                    = "${var.tags}"
+  tags = {
+    Name        = "igw-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
 }
 
 # Route the public subnet traffic through the IGW
@@ -16,14 +20,22 @@ resource "aws_eip" "gw" {
   count      = "${var.az_count}"
   vpc        = true
   depends_on = ["aws_internet_gateway.gw"]
-  tags                    = "${var.tags}"
+  tags = {
+    Name        = "eip-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
 }
 
 resource "aws_nat_gateway" "gw" {
   count         = "${var.az_count}"
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.gw.*.id, count.index)}"
-  tags                    = "${var.tags}"
+  tags = {
+    Name        = "nat-gw-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
 }
 
 # Create a new route table for the private subnets
@@ -37,5 +49,9 @@ resource "aws_route_table" "private" {
     nat_gateway_id = "${element(aws_nat_gateway.gw.*.id, count.index)}"
   }
 
-  tags                    = "${var.tags}"
+  tags = {
+    Name        = "rt-private-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
 }

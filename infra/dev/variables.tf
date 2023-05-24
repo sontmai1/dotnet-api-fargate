@@ -23,6 +23,10 @@ variable "aws_profile" {
 variable "app" {
   default = "openPELServices"
 }
+# Name of the environment. This value should usually match the application tag below.
+variable "env" {
+  default = "test"
+}
 
 # A map of the tags to apply to various resources. The required tags are:
 # `application`, name of the app;
@@ -34,6 +38,7 @@ variable "app" {
 variable "tags" {
   type = "map"
   default = {
+    Name        = "default-name"
     application = "openPELServices"
     environment = "dev"
   }

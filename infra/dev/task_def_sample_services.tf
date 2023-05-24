@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "task1" {
-  family                   = "test_api"
+  family                   = "sample-service"
   memory                   = 512
   cpu                      = 256
   requires_compatibilities = ["FARGATE"]
@@ -8,8 +8,8 @@ resource "aws_ecs_task_definition" "task1" {
   network_mode             = "awsvpc"
   container_definitions = jsonencode(
     [{
-      "name" : "sample-services"
-      "image" : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/sample_api",
+      "name" : "sample-service"
+      "image" : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/sample_api:0.0.0.1",
       "portMappings" : [
         { containerPort = 80 }
       ],

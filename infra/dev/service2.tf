@@ -1,5 +1,5 @@
-resource "aws_ecs_service" "service1" {
-  name        = "Sample-Services"
+resource "aws_ecs_service" "service2" {
+  name        = "pel-services"
   cluster     = aws_ecs_cluster.this.id
   launch_type = "FARGATE"
 
@@ -9,7 +9,7 @@ resource "aws_ecs_service" "service1" {
 #      container_name   = "container_openPELServices"
 #    }
 
-  task_definition = aws_ecs_task_definition.task1.arn
+  task_definition = aws_ecs_task_definition.task2.arn
   desired_count = 1
 
   network_configuration {
@@ -17,6 +17,8 @@ resource "aws_ecs_service" "service1" {
     security_groups  = [aws_security_group.this.id]
     assign_public_ip = true
   }
+
+  
 
 #    depends_on = [aws_lb.this]
 

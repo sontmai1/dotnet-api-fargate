@@ -1,5 +1,5 @@
-resource "aws_ecs_service" "service2" {
-  name        = "PEL-Services"
+resource "aws_ecs_service" "service3" {
+  name        = "auth-service"
   cluster     = aws_ecs_cluster.this.id
   launch_type = "FARGATE"
 
@@ -9,7 +9,7 @@ resource "aws_ecs_service" "service2" {
 #      container_name   = "container_openPELServices"
 #    }
 
-  task_definition = aws_ecs_task_definition.task2.arn
+  task_definition = aws_ecs_task_definition.task3.arn
   desired_count = 1
 
   network_configuration {

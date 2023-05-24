@@ -12,6 +12,7 @@ vpc = "vpc-123"
 private_subnets = "subnet-123,subnet-456"
 public_subnets = "subnet-789,subnet-012"
 tags = {
+  Name        = "openPELServices-dev"
   application = "openPELServices"
   environment = "dev"
 }

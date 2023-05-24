@@ -1,0 +1,71 @@
+export LAB_NAME=dotnet-api-fargate
+export PROJECT_NAME=SampleApi
+export DOT_NET_VERSION=netcoreapp3.1
+export REPO_NAME=sample_api
+export ACCOUNT_NUMBER=$$(aws sts get-caller-identity --outpu  text --query 'Account')
+export AWS_DEFAULT_REGION=us-east-1
+export ECR_URL=${ACCOUNT_NUMBER}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+export ALB_URL=$$(terraform output -json | jq -r '.url.value')
+
+export IMAGE_TAG=0.0.0.1
+
+# You should setup your credential inside the lab env
+lab:
+	docker build -t ${LAB_NAME} .
+
+login-lab:
+	docker run \
+		-it \
+		--rm \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ${PWD}:/aws \
+		-p 6000:6000 \
+		-p 80:80 \
+		--entrypoint sh \
+		--name ${LAB_NAME} \
+		${LAB_NAME}
+
+create-project:
+#	dotnet new webapi -o src/${PROJECT_NAME} --no-https --force
+	dotnet new webapi -o src/${PROJECT_NAME} --no-https --force --framework ${DOT_NET_VERSION}
+
+	
+
+
+# Override run url as docker within docker has localhost lookback issue to start as http://localhost:5000
+run-project:
+#	dotnet run --project src/${PROJECT_NAME} --urls=http://*:6000/
+	dotnet run --project src/${PROJECT_NAME}
+#	docker run --rm -it -p 6000:80 -p 6001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=6001 -e ASPNETCORE_ENVIRONMENT=Development -v ~/.microsoft/usersecrets/:/root/.microsoft/usersecrets -v ~/.aspnet/https:/root/.aspnet/https/ -v ~/.aws:/root/.aws ${LAB_NAME}
+
+# 	
+#	docker run --rm -it -p 6000:80 -p 6001:443 -e aspnetcore_urls="https://+;http://+" -e aspnetcore_https_port=6001 -e aspnetcore_environment=development -v ~/.microsoft/usersecrets/:/root/.microsoft/usersecrets -v ~/.aspnet/https:/root/.aspnet/https/ -v ~/.aws:/root/.aws src/${PROJECT_NAME}
+
+repo:
+	aws ecr create-repository --repository-name ${REPO_NAME} --image-scanning-configuration scanOnPush=true
+#	aws ecr put-image-scanning-configuration --repository-name <repository-name> --image-scanning-configuration scanOnPush=true --region <region>
+
+login:
+	aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}
+
+image:
+	docker build --rm --pull -f src/${PROJECT_NAME}/Dockerfile -t ${REPO_NAME}:${IMAGE_TAG} .
+	docker tag ${REPO_NAME}:${IMAGE_TAG} ${ECR_URL}/${REPO_NAME}:${IMAGE_TAG}
+	docker push ${ECR_URL}/${REPO_NAME}:${IMAGE_TAG}
+
+init:
+	terraform init infra
+
+plan:
+	terraform plan infra
+
+apply:
+	terraform apply -auto-approve infra
+
+test:
+	curl http://${ALB_URL}/WeatherForecast
+
+kill:
+	terraform destroy -auto-approve infra
+#	aws ecr list-images --repository-name ${REPO_NAME} --query 'imageIds[*].imageDigest' --output text | while read imageId; do aws ecr batch-delete-image --repository-name ${REPO_NAME} --image-ids imageDigest=$$imageId; done
+#	aws ecr delete-repository --repository-name ${REPO_NAME}

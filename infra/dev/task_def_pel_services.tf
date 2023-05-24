@@ -1,5 +1,5 @@
 resource "aws_ecs_task_definition" "task2" {
-  family                   = "test_api"
+  family                   = "pel-services"
   memory                   = 512
   cpu                      = 256
   requires_compatibilities = ["FARGATE"]
@@ -9,12 +9,16 @@ resource "aws_ecs_task_definition" "task2" {
   container_definitions = jsonencode(
     [{
       "name" : "pel-services"
-      "image" : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/pelservices",
+      "image" : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/pelservices:0.0.0.1",
       "portMappings" : [
         { containerPort = 8080 }
       ],
     }]
   )
 
-  tags                    = "${var.tags}"
+  tags = {
+    Name        = "task-${var.app}-${var.env}"
+    application = "${var.app}"
+    environment = "${var.env}"
+  }
 }
